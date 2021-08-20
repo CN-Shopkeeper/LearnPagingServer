@@ -17,12 +17,34 @@ class MovieCtl{
     getPkds(ctx){
         const startPosition=ctx.query.page*10;
         const endPosition=startPosition+10;
+        const hasMore=endPosition<db.length;
         // 不需要判断是否越界，slice方法帮助我们处理了越界问题
         const result=db.slice(startPosition,endPosition);
         ctx.body={
-            count: db.length,
-            movies: result
+            has_more: hasMore,
+            subjects: result
         };
+    }
+
+    getIkds(ctx){
+        var since=ctx.query.since;
+        var startPosition=0;
+        var endPosition=0;
+        const pagesize=ctx.query.pagesize;
+        if (since==0){
+            startPosition=0;
+            endPosition=startPosition+pagesize;
+        }else{
+            for (var i=0;i<db.length;i++){
+                if (db[i].id == since){
+                    startPosition=i+1;
+                    endPosition=startPosition+pagesize;
+                    break;
+                }
+            }
+        }
+        const result=db.slice(startPosition,endPosition);
+        ctx.body=result;
     }
 
     index(ctx){
@@ -30,17 +52,6 @@ class MovieCtl{
     }
 
     getAllMovies(ctx){
-        // const temp_db=[];
-        // for (let movie of db){
-        //     delete movie.episodes_info;
-        //     delete movie.cover_x;
-        //     delete movie.playable;
-        //     delete movie.id;
-        //     delete movie.cover_y;
-        //     delete movie.is_new;
-        //     delete movie.url;
-        //     temp_db.push(movie);
-        // }
         ctx.body={
             count: db.length,
             movies: db
